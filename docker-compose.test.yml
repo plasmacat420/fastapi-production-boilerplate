@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      TEST_DATABASE_URL: sqlite+aiosqlite:///./test.db
+      SECRET_KEY: test-secret-key-for-ci-only
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+    command: >
+      sh -c "pip install -e '.[dev]' &&
+             pytest -v --cov=app --cov-report=term-missing"
+
+  redis:
+    image: redis:7-alpine
